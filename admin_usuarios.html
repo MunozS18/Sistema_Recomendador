@@ -1,0 +1,168 @@
+{% extends 'base.html' %}
+<link rel="icon" href="../static/Captura de pantalla 2025-06-25 141949.png">
+<link rel="stylesheet" href="../static/css/styles.css">
+{% block extra_head %}
+<style>
+body.ajustes-bg { background: linear-gradient(135deg, #e0eafc 0%, #cfdef3 100%) !important; }
+body.admin-usuarios-bg h1,
+body.admin-usuarios-bg h2,
+body.admin-usuarios-bg h3,
+body.admin-usuarios-bg h4,
+body.admin-usuarios-bg h5,
+body.admin-usuarios-bg h6,
+body.admin-usuarios-bg .section-title {
+  color: #232536 !important;
+  text-shadow: none !important;
+}
+</style>
+{% endblock %}
+<script>document.body.classList.add('ajustes-bg');</script>
+{% block title %}Panel de Usuarios | Sistema Recomendador 🏨{% endblock %}
+{% block content %}
+<script>document.body.classList.add('admin-usuarios-bg');</script>
+<div class="row justify-content-center">
+  <div class="col-md-10">
+    <div class="card shadow-lg p-4" data-aos="fade-up">
+      <h2 class="mb-4 text-center section-title">Usuarios registrados</h2>
+      <div class="table-responsive">
+        <table class="table table-hover align-middle">
+          <thead class="table-dark">
+            <tr>
+              <th>Nombre</th>
+              <th>Email</th>
+              <th>Fecha de registro</th>
+              <th>Último login</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for user in usuarios %}
+            <tr>
+              <td>{{ user.nombre }}</td>
+              <td>{{ user.email }}</td>
+              <td>{{ user.fecha_registro.strftime('%d/%m/%Y') if user.fecha_registro else 'N/D' }}</td>
+              <td>{{ user.ultimo_login.strftime('%d/%m/%Y %H:%M') if user.ultimo_login else 'N/D' }}</td>
+              <td>
+                <button class="btn btn-outline-primary btn-sm ver-detalle" data-id="{{ user.id_usuario }}">Ver historial</button>
+                <button class="btn btn-outline-danger btn-sm eliminar-usuario" data-id="{{ user.id_usuario }}">Eliminar</button>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal de historial de usuario -->
+<div class="modal fade" id="modalHistorial" tabindex="-1" aria-labelledby="modalHistorialLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header bg-primary text-white">
+        <h5 class="modal-title" id="modalHistorialLabel">Historial de usuario</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+      </div>
+      <div class="modal-body">
+        <div id="historial-content" class="p-2">
+          <div class="text-center text-muted">Cargando...</div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+        <button type="button" class="btn btn-danger" id="borrarHistorial">Borrar historial</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal de confirmación de eliminación -->
+<div class="modal fade" id="modalEliminar" tabindex="-1" aria-labelledby="modalEliminarLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header bg-danger text-white">
+        <h5 class="modal-title" id="modalEliminarLabel">Eliminar usuario</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+      </div>
+      <div class="modal-body">
+        <p>¿Estás seguro de que deseas eliminar este usuario? Esta acción no se puede deshacer.</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+        <button type="button" class="btn btn-danger" id="confirmarEliminar">Eliminar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+let usuarioAEliminar = null;
+
+// Ver historial
+$('.ver-detalle').on('click', function() {
+  const userId = $(this).data('id');
+  $('#historial-content').html('<div class="text-center text-muted">Cargando...</div>');
+  $('#modalHistorial').modal('show');
+  $.get(`/admin/usuario/${userId}/detalle`, function(data) {
+    let html = `<div class='mb-2'><strong>Nombre:</strong> ${data.nombre}</div>`;
+    html += `<div class='mb-2'><strong>Email:</strong> ${data.email}</div>`;
+    html += `<div class='mb-2'><strong>Fecha de registro:</strong> ${data.fecha_registro}</div>`;
+    html += `<div class='mb-2'><strong>Último login:</strong> ${data.ultimo_login}</div>`;
+    html += `<hr><h6>Preferencias</h6>`;
+    html += `<ul>`;
+    html += `<li><strong>Tipo de viaje:</strong> ${data.preferencias.tipo_viaje}</li>`;
+    html += `<li><strong>Presupuesto:</strong> ${data.preferencias.presupuesto}</li>`;
+    html += `<li><strong>Ubicación preferida:</strong> ${data.preferencias.ubicacion_preferida}</li>`;
+    html += `<li><strong>Amenities:</strong> ${data.preferencias.amenities_importantes}</li>`;
+    html += `</ul>`;
+    html += `<hr><h6>Valoraciones</h6>`;
+    if(data.valoraciones.length > 0) {
+      html += '<ul>';
+      data.valoraciones.forEach(v => {
+        html += `<li><strong>${v.hotel}:</strong> ${v.puntuacion} ⭐ - ${v.comentario || ''}</li>`;
+      });
+      html += '</ul>';
+    } else {
+      html += '<div class="text-muted">Sin valoraciones.</div>';
+    }
+    html += `<hr><h6>Interacciones</h6>`;
+    if(data.interacciones.length > 0) {
+      html += '<ul>';
+      data.interacciones.forEach(i => {
+        html += `<li><strong>${i.hotel}:</strong> ${i.tipo} (${i.valor})</li>`;
+      });
+      html += '</ul>';
+    } else {
+      html += '<div class="text-muted">Sin interacciones.</div>';
+    }
+    $('#historial-content').html(html);
+  });
+});
+
+// Eliminar usuario
+$('.eliminar-usuario').on('click', function() {
+  usuarioAEliminar = $(this).data('id');
+  $('#modalEliminar').modal('show');
+});
+$('#confirmarEliminar').on('click', function() {
+  if(usuarioAEliminar) {
+    $.post(`/admin/usuario/${usuarioAEliminar}/eliminar`, function(resp) {
+      if(resp.success) {
+        location.reload();
+      }
+    });
+  }
+});
+$('#borrarHistorial').on('click', function() {
+  if(confirm('¿Estás seguro de borrar todo el historial de este usuario? Esta acción no se puede deshacer.')) {
+    const userId = $('#modalHistorial').find('.ver-detalle').data('id') || $('.ver-detalle.active').data('id') || $('.ver-detalle').first().data('id');
+    $.post(`/admin/usuario/${userId}/borrar_historial`, function(resp) {
+      if(resp.success) {
+        $('#modalHistorial').modal('hide');
+        setTimeout(() => location.reload(), 500);
+      }
+    });
+  }
+});
+</script>
+{% endblock %} 

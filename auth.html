@@ -1,0 +1,208 @@
+{% extends 'base.html' %}
+<link rel="icon" href="../static/Captura de pantalla 2025-06-25 141949.png">
+<link rel="stylesheet" href="../static/css/styles.css">
+{% block title %}Acceso | Sistema Recomendador 🏨{% endblock %}
+{% block content %}
+<style>
+  /* El fondo global se define en styles.css, aquí solo estilos de la tarjeta y tabs */
+  .auth-bg {
+    position: fixed;
+    top: 0; left: 0; width: 100vw; height: 100vh;
+    z-index: 0;
+    pointer-events: none;
+    background: url(../pexels-richard-l-2150581203-32722830.jpg) center no-repeat;
+  }
+  .auth-card {
+    background: rgba(30, 32, 44, 0.97);
+    border-radius: 24px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.25);
+    color: #fff;
+    position: relative;
+    z-index: 1;
+  }
+  .auth-tabs {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 2rem;
+    border-bottom: 2.5px solid #44495e;
+  }
+  .auth-tab {
+    flex: 1;
+    text-align: center;
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: #b0b8d1;
+    background: none;
+    border: none;
+    outline: none;
+    padding: 0.8rem 0 0.6rem 0;
+    cursor: pointer;
+    position: relative;
+    transition: color 0.3s;
+  }
+  .auth-tab.active {
+    color: #fff;
+  }
+  .auth-tab.active::after {
+    content: '';
+    display: block;
+    margin: 0 auto;
+    width: 60%;
+    height: 4px;
+    border-radius: 2px;
+    background: linear-gradient(90deg, #ff6a00 0%, #00c6ff 100%);
+    position: absolute;
+    left: 20%;
+    bottom: -2.5px;
+    animation: underlineIn 0.4s;
+  }
+  @keyframes underlineIn {
+    from { width: 0; opacity: 0; }
+    to { width: 60%; opacity: 1; }
+  }
+  .tab-content > .tab-pane {
+    min-height: 350px;
+    animation: slideFadeIn 0.7s cubic-bezier(.77,0,.18,1);
+  }
+  @keyframes slideFadeIn {
+    from { opacity: 0; transform: translateX(60px) scale(0.98); }
+    to { opacity: 1; transform: none; }
+  }
+  .form-label, .form-control::placeholder {
+    color: #b0b8d1 !important;
+  }
+  .form-control {
+    background: #232536;
+    color: #fff;
+    border: 1.5px solid #44495e;
+    border-radius: 16px;
+    font-size: 1.08rem;
+  }
+  .form-control:focus {
+    border-color: #00c6ff;
+    box-shadow: 0 0 0 0.2rem #00c6ff33;
+    background: #232536;
+    color: #fff;
+  }
+  .btn-primary, .btn-success {
+    background: linear-gradient(90deg, #ff6a00 0%, #00c6ff 100%);
+    border: none;
+    font-weight: 700;
+    letter-spacing: 1px;
+    box-shadow: 0 2px 8px rgba(0,198,255,0.10);
+    transition: background 0.2s;
+  }
+  .btn-primary:hover, .btn-success:hover {
+    background: linear-gradient(90deg, #00c6ff 0%, #ff6a00 100%);
+  }
+  .footer-auth {
+    background: transparent;
+    color: #fefefe;
+    font-size: 1.2rem;
+    letter-spacing: 1px;
+    text-align: center;
+    padding: 24px 0 12px 0;
+    border-top-left-radius: 24px;
+    border-top-right-radius: 24px;
+    margin-top: 32px;
+    box-shadow: 0 -2px 12px rgba(0,0,0,0.07);
+  }
+</style>
+<div class="auth-bg"></div>
+<div class="row justify-content-center align-items-center" style="min-height: 90vh;">
+  <div class="col-12 col-sm-10 col-md-8 col-lg-5">
+    <div class="card auth-card shadow-lg p-4" data-aos="zoom-in">
+      <div class="auth-tabs">
+        <button class="auth-tab {% if active_tab == 'login' %}active{% endif %}" id="login-tab" type="button">Iniciar sesión</button>
+        <button class="auth-tab {% if active_tab == 'register' %}active{% endif %}" id="register-tab" type="button">Registrarse</button>
+      </div>
+      <div class="tab-content position-relative" id="authTabsContent">
+        <div class="tab-pane fade {% if active_tab == 'login' %}show active{% endif %}" id="login-pane" role="tabpanel" aria-labelledby="login-tab">
+          <form method="POST" novalidate autocomplete="off">
+            {{ login_form.hidden_tag() }}
+            <div class="mb-3">
+              {{ login_form.email.label(class="form-label") }}
+              {{ login_form.email(class="form-control", placeholder="ejemplo@email.com") }}
+              {% for error in login_form.email.errors %}
+                <div class="text-danger small">{{ error }}</div>
+              {% endfor %}
+            </div>
+            <div class="mb-3">
+              {{ login_form.contrasena.label(class="form-label") }}
+              {{ login_form.contrasena(class="form-control", placeholder="Contraseña") }}
+              {% for error in login_form.contrasena.errors %}
+                <div class="text-danger small">{{ error }}</div>
+              {% endfor %}
+            </div>
+            <div class="d-grid">
+              {{ login_form.submit(class="btn btn-primary btn-lg") }}
+            </div>
+          </form>
+        </div>
+        <div class="tab-pane fade {% if active_tab == 'register' %}show active{% endif %}" id="register-pane" role="tabpanel" aria-labelledby="register-tab">
+          <form method="POST" novalidate autocomplete="off">
+            {{ register_form.hidden_tag() }}
+            <div class="mb-3">
+              {{ register_form.nombre_usuario.label(class="form-label") }}
+              {{ register_form.nombre_usuario(class="form-control", placeholder="Tu nombre de usuario") }}
+              {% for error in register_form.nombre_usuario.errors %}
+                <div class="text-danger small">{{ error }}</div>
+              {% endfor %}
+            </div>
+            <div class="mb-3">
+              {{ register_form.email.label(class="form-label") }}
+              {{ register_form.email(class="form-control", placeholder="ejemplo@email.com") }}
+              {% for error in register_form.email.errors %}
+                <div class="text-danger small">{{ error }}</div>
+              {% endfor %}
+            </div>
+            <div class="mb-3">
+              {{ register_form.contrasena.label(class="form-label") }}
+              {{ register_form.contrasena(class="form-control", placeholder="Contraseña segura") }}
+              {% for error in register_form.contrasena.errors %}
+                <div class="text-danger small">{{ error }}</div>
+              {% endfor %}
+            </div>
+            <div class="mb-3">
+              {{ register_form.confirmar_contrasena.label(class="form-label") }}
+              {{ register_form.confirmar_contrasena(class="form-control", placeholder="Repite tu contraseña") }}
+              {% for error in register_form.confirmar_contrasena.errors %}
+                <div class="text-danger small">{{ error }}</div>
+              {% endfor %}
+            </div>
+            <div class="d-grid">
+              {{ register_form.submit(class="btn btn-success btn-lg") }}
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+    
+  </div>
+  <div class="footer-auth mt-4">
+    Bienvenido a nuestro Sistema Recomendador 🏨 | 2025
+  </div>
+</div>
+<script>
+  // Tabs animadas personalizadas
+  const loginTab = document.getElementById('login-tab');
+  const registerTab = document.getElementById('register-tab');
+  const loginPane = document.getElementById('login-pane');
+  const registerPane = document.getElementById('register-pane');
+  function showTab(tab) {
+    if(tab === 'login') {
+      loginTab.classList.add('active');
+      registerTab.classList.remove('active');
+      loginPane.classList.add('show', 'active');
+      registerPane.classList.remove('show', 'active');
+    } else {
+      registerTab.classList.add('active');
+      loginTab.classList.remove('active');
+      registerPane.classList.add('show', 'active');
+      loginPane.classList.remove('show', 'active');
+    }
+  }
+  loginTab.addEventListener('click', () => showTab('login'));
+  registerTab.addEventListener('click', () => showTab('register'));
+</script>
+{% endblock %} 

@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title style="font-family: 'Times New Roman', Times, serif;">Sistema Recomendador de Hoteles 🏨</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;400&display=swap" rel="stylesheet">
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/styles.css">
+    <link rel="icon" href="../static/Captura de pantalla 2025-06-25 141949.png">
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow-sm">
+      <div class="container">
+        <a class="navbar-brand fw-bold" href="#" style="font-family: 'Times New Roman', Times, serif;">Sistema Recomendador</a>
+      </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero-section d-flex align-items-center justify-content-center text-center">
+      <div class="container">
+        <h1 class="display-4 fw-bold mb-3" data-aos="fade-down" style="font-family: 'Times New Roman', Times, serif;">Descubre los mejores hoteles en Cartagena de Indias</h1>
+        <p class="lead mb-4" data-aos="fade-up" style="font-family: 'Times New Roman', Times, serif;">Filtra, compara y encuentra tu alojamiento ideal con la mejor experiencia visual y de usuario.</p>
+        <a href="#hotels" class="btn btn-lg btn-primary shadow" data-aos="zoom-in">Ver hoteles</a>
+      </div>
+    </section>
+
+    <!-- Filtros -->
+    <div id="filters" class="mb-4 sticky-top filters-container" style="top: 70px; z-index: 1020;"></div>
+
+    <!-- Hoteles -->
+    <div id="hotels" class="row g-4"></div>
+
+    <!-- Footer -->
+    <footer class="footer mt-5 py-4 bg-dark text-white text-center">
+      <div class="container">
+        <span style="font-family: 'Times New Roman', Times, serif;">Bienvenido a nuestro Sistema Recomendador | 2024</span>
+      </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script src="/static/js/main.js"></script>
+    <script>AOS.init({ duration: 900, once: true });</script>
+</body>
+</html> 

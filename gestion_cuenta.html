@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+{% block title %}Gestión de Cuenta | Sistema Recomendador{% endblock %}
+{% block content %}
+<div class="container py-4">
+  <h2 class="mb-4 text-primary"><i class="bi bi-person-gear"></i> Gestión de mi cuenta</h2>
+  <div class="card shadow-sm p-4 mb-4" style="max-width:500px; margin:auto;">
+    <div class="mb-3">
+      <label class="form-label">ID de usuario</label>
+      <input type="text" class="form-control" value="{{ user.id_usuario }}" readonly>
+    </div>
+    <div class="mb-3">
+      <label class="form-label">Correo electrónico</label>
+      <input type="email" class="form-control" value="{{ user.email }}" readonly>
+    </div>
+    <div class="mb-3 d-flex align-items-center justify-content-between">
+      <span class="form-label mb-0">Contraseña</span>
+      <a href="/cambiar_contrasena" class="btn btn-outline-primary btn-sm">Cambiar contraseña</a>
+    </div>
+    <div class="mb-3 d-flex align-items-center justify-content-between">
+      <span class="form-label mb-0">Eliminar cuenta</span>
+      <form method="POST" action="/eliminar_cuenta" onsubmit="return confirm('¿Estás seguro de eliminar tu cuenta? Esta acción no se puede deshacer.');">
+        <button type="submit" class="btn btn-outline-danger btn-sm">Eliminar</button>
+      </form>
+    </div>
+    <div class="mb-2 d-flex align-items-center justify-content-between">
+      <span class="form-label mb-0">Recibir notificaciones</span>
+      <div class="form-check form-switch mb-0">
+        <input class="form-check-input" type="checkbox" id="notificacionesSwitch" checked>
+        <label class="form-check-label" for="notificacionesSwitch"></label>
+      </div>
+    </div>
+  </div>
+  <a href="/ajustes" class="btn btn-outline-primary mt-3"><i class="bi bi-arrow-left"></i> Volver a ajustes</a>
+</div>
+{% endblock %} 

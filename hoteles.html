@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+<link rel="icon" href="../static/Captura de pantalla 2025-06-25 141949.png">
+<link rel="stylesheet" href="../static/css/styles.css">
+{% block title %}Hoteles | Sistema Recomendador 🏨{% endblock %}
+{% block content %}
+<div class="container mb-5">
+  <div class="text-center py-4">
+    <h1 class="display-4 fw-bold mb-2 titulo-principal">Encuentra tu hotel ideal</h1>
+    <p class="lead text-muted mb-4">Explora, filtra y descubre los mejores hoteles para ti. ¡Personaliza tu búsqueda y encuentra tu próxima experiencia!</p>
+  </div>
+  <div id="filters" class="mb-4"></div>
+  <div class="recomendaciones-section">
+    <h2 class="mb-4 text-center" style="font-weight:700; color:#0d6efd;">Recomendados para ti <span>🫵</span></h2>
+    <div class="row" id="recomendaciones"></div>
+    <hr class="my-5">
+  </div>
+  <div class="todos-hoteles-section">
+    <h3 class="mb-4 text-center" style="font-weight:700; color:#222;">Todos los hoteles</h3>
+    <div class="row" id="hotels"></div>
+  </div>
+</div>
+<!-- Modal de detalles del hotel -->
+<div class="modal fade" id="hotelModal" tabindex="-1" aria-labelledby="hotelModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="hotelModalLabel">Detalles del hotel</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+      </div>
+      <div class="modal-body">
+        <div class="row">
+          <div class="col-md-5">
+            <img id="modal-hotel-img" src="" class="img-fluid rounded mb-3" alt="Imagen hotel">
+          </div>
+          <div class="col-md-7">
+            <h4 id="modal-hotel-nombre" class="mb-2 text-dark"></h4>
+            <div class="mb-2"><span id="modal-hotel-stars"></span></div>
+            <div class="mb-2"><strong>Precio:</strong> <span id="modal-hotel-precio"></span></div>
+            <div class="mb-2"><strong>Ubicación:</strong> <span id="modal-hotel-ubicacion"></span></div>
+            <div class="mb-2"><strong>Rating:</strong> <span id="modal-hotel-rating"></span></div>
+            <div class="mb-2"><strong>Amenities:</strong> <span id="modal-hotel-amenities"></span></div>
+            <div class="mb-2"><strong>Valoraciones totales:</strong> <span id="modal-hotel-totalvaloraciones"></span></div>
+            <div class="mb-2"><strong>Opiniones:</strong>
+              <ul id="modal-hotel-reviews" class="list-unstyled small" style="max-height:100px;overflow:auto;"></ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %} 

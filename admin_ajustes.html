@@ -1,0 +1,155 @@
+{% extends 'base.html' %}
+<link rel="icon" href="../static/Captura de pantalla 2025-06-25 141949.png">
+<link rel="stylesheet" href="../static/css/styles.css">
+{% block extra_head %}
+<style>
+body.admin-ajustes-bg h1,
+body.admin-ajustes-bg h2,
+body.admin-ajustes-bg h3,
+body.admin-ajustes-bg h4,
+body.admin-ajustes-bg h5,
+body.admin-ajustes-bg h6,
+body.admin-ajustes-bg .section-title {
+  color: #232536 !important;
+  text-shadow: none !important;
+}
+</style>
+{% endblock %}
+{% block title %}Ajustes Admin | Sistema Recomendador{% endblock %}
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0"><i class="bi bi-gear-fill"></i> Panel de Administración</h4>
+                </div>
+                <div class="card-body">
+                    <h5 class="card-title">Configuración del Sistema</h5>
+                    <p class="text-muted">Este panel permite configurar el scraping en tiempo real de <strong>Booking.com</strong></p>
+                    
+                    <form method="POST" class="mt-4">
+                        {{ formulario.hidden_tag() }}
+                       
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="destino" class="form-label">Destino</label>
+                                    <input type="text" class="form-control" id="destino" name="destino" value="Cartagena" placeholder="Ej: Cartagena, Bogotá, Medellín">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="hotel_limit" class="form-label">Número de Hoteles</label>
+                                    <input type="number" class="form-control" id="hotel_limit" name="hotel_limit" value="20" min="5" max="1000">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="checkin" class="form-label">Fecha de Llegada (opcional)</label>
+                                    <input type="date" class="form-control" id="checkin" name="checkin">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="checkout" class="form-label">Fecha de Salida (opcional)</label>
+                                    <input type="date" class="form-control" id="checkout" name="checkout">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-play-circle"></i> Ejecutar Scraping de Booking.com
+                        </button>
+                    </form>
+                    
+                    {% if hoteles %}
+                    <div class="mt-4">
+                        <h6>Resultados del último scraping:</h6>
+                        <div class="table-responsive">
+                            <table class="table table-sm">
+                                <thead>
+                                    <tr>
+                                        <th>Hotel</th>
+                                        <th>Precio</th>
+                                        <th>Estrellas</th>
+                                        <th>Rating</th>
+                                        <th>Ubicación</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for hotel in hoteles[:5] %}
+                                    <tr>
+                                        <td>{{ hotel.name }}</td>
+                                        <td>{{ hotel.price }}</td>
+                                        <td>
+                                            {% if hotel.stars is number %}
+                                                {% for i in range(hotel.stars) %}
+                                                    <i class="bi bi-star-fill text-warning"></i>
+                                                {% endfor %}
+                                            {% else %}
+                                                <span class="badge bg-info text-dark">{{ hotel.stars }}</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>{{ hotel.rating or 'N/A' }}</td>
+                                        <td>{{ hotel.location or 'N/A' }}</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        <small class="text-muted">Mostrando los primeros 5 resultados de {{ hoteles|length }} hoteles extraídos...</small>
+                    </div>
+                    {% endif %}
+
+                    {% if fecha_usada %}
+                    <div class="alert alert-info mt-3">
+                        <strong>Nota:</strong> No se encontraron hoteles para la fecha solicitada. Se usó la siguiente fecha para obtener resultados: <b>{{ fecha_usada }}</b>
+                    </div>
+                    {% endif %}
+
+                    {% if resumen_scraping %}
+                    <div class="alert alert-info mt-4" style="font-size:1.05rem;">
+                      <strong>Resumen del scraping:</strong><br>
+                      Hoteles enriquecidos con Trivago: <b>{{ resumen_scraping.trivago }}</b><br>
+                      Hoteles solo con Booking: <b>{{ resumen_scraping.booking }}</b>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <div class="card mt-4 shadow">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0"><i class="bi bi-info-circle"></i> Información del Sistema</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6>Base de Datos Local:</h6>
+                            <ul class="list-unstyled">
+                                <li><i class="bi bi-check-circle text-success"></i> Usuarios registrados</li>
+                                <li><i class="bi bi-check-circle text-success"></i> Preferencias de usuarios</li>
+                                <li><i class="bi bi-check-circle text-success"></i> Valoraciones de hoteles</li>
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <h6>Datos de Booking.com:</h6>
+                            <ul class="list-unstyled">
+                                <li><i class="bi bi-arrow-clockwise text-primary"></i> Información de hoteles</li>
+                                <li><i class="bi bi-arrow-clockwise text-primary"></i> Precios actualizados</li>
+                                <li><i class="bi bi-arrow-clockwise text-primary"></i> Ratings y estrellas</li>
+                                <li><i class="bi bi-arrow-clockwise text-primary"></i> Imágenes y descripciones</li>
+                                <li><i class="bi bi-arrow-clockwise text-primary"></i> Amenities y ubicaciones</li>
+                                <li><i class="bi bi-arrow-clockwise text-primary"></i> Reviews de usuarios</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

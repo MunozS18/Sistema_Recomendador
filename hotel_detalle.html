@@ -1,0 +1,272 @@
+{% extends 'base.html' %}
+{% block title %}Detalles de {{ hotel.name }} | Sistema Recomendador{% endblock %}
+{% block extra_head %}
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <style>
+      .amenity-chip {
+        background: #f8f9fa;
+        border: 1px solid #e0e0e0;
+        color: #222;
+        margin-bottom: 6px;
+        margin-right: 6px;
+        font-weight: 500;
+        transition: box-shadow 0.2s;
+      }
+      .amenity-chip:hover {
+        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        background: #e9ecef;
+      }
+      .amenities-list {
+        gap: 0.5rem;
+      }
+      .amenity-chip-mini {
+        background: #f8f9fa;
+        border: 1px solid #e0e0e0;
+        color: #333;
+        margin-bottom: 3px;
+        margin-right: 3px;
+        font-weight: 500;
+        font-size: 0.92em;
+        padding: 1px 8px;
+        transition: box-shadow 0.2s;
+      }
+      .amenity-chip-mini:hover {
+        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        background: #e9ecef;
+      }
+    </style>
+{% endblock %}
+{% block content %}
+<div class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-lg-10">
+      <div class="bg-white rounded shadow p-4 position-relative">
+        <!-- Botón de favorito como corazón arriba a la derecha -->
+        <button id="btn-favorito" class="btn btn-fav-heart position-absolute" style="top:18px; right:24px; z-index:10; font-size:2.2rem; background:transparent; border:none;" title="Marcar como favorito">
+          {% if es_favorito %}
+            <i class="bi bi-heart-fill text-primary"></i>
+          {% else %}
+            <i class="bi bi-heart text-primary"></i>
+          {% endif %}
+        </button>
+        <span id="favorito-msg" class="text-success ms-2" style="display:none; position:absolute; top:18px; right:80px; font-size:1.1rem;">¡Guardado como favorito!</span>
+        <!-- Toast de confirmación de favorito -->
+        <div class="position-fixed top-0 end-0 p-3" style="z-index: 1100;">
+          <div id="toastFavorito" class="toast align-items-center text-bg-primary border-0" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="d-flex">
+              <div class="toast-body">
+                <i class="bi bi-heart-fill me-2"></i> El hotel se ha añadido a tus favoritos.<br>
+                <a href="/favoritos" class="btn btn-light btn-sm mt-2">Ver favoritos</a>
+              </div>
+              <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Cerrar"></button>
+            </div>
+          </div>
+        </div>
+        <div class="row align-items-center">
+          <div class="col-md-5 text-center">
+            {% set num_images = hotel.images|length %}
+            {% if num_images > 1 %}
+              <div id="carouselHotelImages" class="carousel slide mb-3" data-bs-ride="carousel">
+                <div class="carousel-inner">
+                  {% for img in hotel.images %}
+                  <div class="carousel-item {% if loop.index0 == 0 %}active{% endif %}">
+                    <img src="{{ img }}" class="d-block w-100 rounded" alt="Imagen hotel" style="max-height:340px; object-fit:cover;">
+                  </div>
+                  {% endfor %}
+                </div>
+                <button class="carousel-control-prev" type="button" data-bs-target="#carouselHotelImages" data-bs-slide="prev">
+                  <span class="carousel-control-prev-icon"></span>
+                </button>
+                <button class="carousel-control-next" type="button" data-bs-target="#carouselHotelImages" data-bs-slide="next">
+                  <span class="carousel-control-next-icon"></span>
+                </button>
+              </div>
+            {% elif num_images == 1 %}
+              <div class="mb-3 text-center">
+                <img src="{{ hotel.images[0] }}" alt="Imagen principal de {{ hotel.name }}" class="img-fluid rounded shadow" style="max-width: 400px; max-height: 250px; object-fit:cover;">
+              </div>
+            {% elif hotel.image %}
+              <div class="mb-3 text-center">
+                <img src="{{ hotel.image }}" alt="Imagen principal de {{ hotel.name }}" class="img-fluid rounded shadow" style="max-width: 400px; max-height: 250px; object-fit:cover;">
+              </div>
+            {% else %}
+              <div class="mb-3 text-center text-muted">Sin imagen disponible</div>
+            {% endif %}
+            <!-- Aquí NO va el bloque de opiniones ni el botón duplicados -->
+          </div>
+          <div class="col-md-7">
+            <h2 class="mb-2 fw-bold text-dark hotel-nombre">{{ hotel.name }}</h2>
+            {% if hotel.stars and hotel.stars != 'No disponible' and hotel.stars != 'Sin clasificar' %}
+              {% set stars_num = hotel.stars|replace('estrellas','')|replace('estrella','')|replace(':','')|replace(',','.')|trim|float %}
+              <div class="mb-2">
+                {% for i in range(1,6) %}
+                  {% if i <= stars_num %}
+                    <span style="color:#ffd700; font-size:1.7em;">&#9733;</span>
+                  {% else %}
+                    <span style="color:#ffd700; opacity:0.22; font-size:1.7em;">&#9733;</span>
+                  {% endif %}
+                {% endfor %}
+              </div>
+            {% else %}
+              <span class="badge bg-info text-dark mb-2">Sin clasificar</span>
+            {% endif %}
+            <div class="mb-3">
+              {% if hotel.price and hotel.price != 'Consultar' and hotel.price != 'N/D' %}
+                <span class="badge bg-success fs-4 px-4 py-2">{{ hotel.price }}</span>
+              {% else %}
+                <a href="https://www.google.com/search?q={{ hotel.name|urlencode }}+{{ hotel.location|urlencode }}+precio+hotel" target="_blank" class="btn btn-outline-primary btn-sm ms-2">Buscar precio en Google</a>
+              {% endif %}
+            </div>
+            <div class="mb-2"><i class="bi bi-geo-alt"></i> <strong>Ubicación:</strong> {{ hotel.location|e or 'No disponible' }}</div>
+            <div class="mb-2" style="display:flex; align-items:center; gap:8px;">
+              <i class="bi bi-star-half"></i>
+              <strong style="margin-right:4px;">Rating:</strong>
+              {% if hotel.rating_score %}
+                <span class="badge rounded-pill bg-success" style="font-size:0.95em; padding:0.35em 0.7em; opacity:0.92;">
+                  {{ hotel.rating_score }}/{{ hotel.rating_max_score or 10 }}
+                </span>
+                <div style="width: 70px; height: 8px; background: transparent; border-radius: 4px; border: 1px solid #e0e0e0; margin-left:4px; overflow:hidden; display:inline-block;">
+                  <div style="height:100%; background: #28a745; width: {{ ((hotel.rating_score|default(0)|float) / (hotel.rating_max_score|default(10)|float) * 100) | round(1) }}%; border-radius: 4px 0 0 4px;"></div>
+                </div>
+              {% elif hotel.rating %}
+                <span class="badge rounded-pill bg-success" style="font-size:0.95em; padding:0.35em 0.7em; opacity:0.92;">{{ hotel.rating }}</span>
+              {% else %}
+                <span class="badge rounded-pill bg-secondary" style="font-size:0.95em; padding:0.35em 0.7em; opacity:0.92;">No disponible</span>
+              {% endif %}
+            </div>
+            <div class="mb-2"><i class="bi bi-star"></i> <strong>Estrellas:</strong>
+              {% if hotel.stars_count %}
+                {% for i in range(hotel.stars_count) %}
+                  <i class="bi bi-star-fill text-warning"></i>
+                {% endfor %}
+                ({{ hotel.stars_count }})
+              {% else %}
+                {{ hotel.stars_formatted or 'Sin clasificar' }}
+              {% endif %}
+            </div>
+            <div class="mb-2">
+              <i class="bi bi-info-circle"></i> <strong>Descripción:</strong>
+              <div style="white-space: pre-line;">
+                {{ hotel.description or 'No disponible' }}
+              </div>
+            </div>
+            {# Amenities compactos con emoji debajo de la descripción #}
+            {% set amenity_emojis = {
+              'wifi': '📶',
+              'wifi gratis': '📶',
+              'piscina': '🏊',
+              'piscina interior': '🏊‍♂️',
+              'piscina exterior': '🏊‍♀️',
+              'desayuno': '🥐',
+              'buen desayuno': '🍳',
+              'aire acondicionado': '❄️',
+              'spa': '💆',
+              'gimnasio': '🏋️',
+              'restaurante': '🍽️',
+              'bar': '🍸',
+              'parking': '🅿️',
+              'estacionamiento': '🅿️',
+              'servicio a la habitación': '🛎️',
+              'tv': '📺',
+              'balcón': '🌅',
+              'vista al mar': '🌊',
+              'mascotas permitidas': '🐾',
+              'recepción 24h': '🕛',
+              'habitaciones sin humo': '🚭',
+              'baño privado': '🛁',
+              'secador de pelo': '💇',
+              'caja fuerte': '🔒',
+              'nevera': '🧊',
+              'servicio de traslado': '🚗',
+              'servicio de limpieza diario': '🧹',
+              'ascensor': '🛗',
+              'calefacción': '🔥',
+              'inglés': '🇬🇧',
+              'español': '🇪🇸'
+            } %}
+            {% if hotel.amenities and hotel.amenities is iterable and hotel.amenities[0] is mapping %}
+              <div class="mt-2 mb-3">
+                <strong>Amenities:</strong>
+                <div class="amenities-list d-flex flex-wrap gap-1 mt-1">
+                  {% for amenity in hotel.amenities %}
+                    {% set key = amenity.text.lower() %}
+                    <span class="amenity-chip-mini d-flex align-items-center px-2 py-1 rounded-pill shadow-sm bg-light border" style="font-size:0.92em;">
+                      <span>{% if amenity_emojis.get(key) %}{{ amenity_emojis[key] }}{% else %}🔹{% endif %}</span>
+                      <span class="ms-1">{{ amenity.text }}</span>
+                    </span>
+                  {% endfor %}
+                </div>
+              </div>
+            {% endif %}
+            <div class="mb-2">
+              <!-- Eliminar el botón de favorito de la parte inferior -->
+            </div>
+          </div>
+        </div>
+        <!-- Opiniones y botón solo al final -->
+        <div class="mb-2"><i class="bi bi-chat-dots"></i> <strong>Opiniones:</strong>
+          {% if hotel.todas_opiniones and hotel.todas_opiniones|length > 0 %}
+            <ul class="list-unstyled small" style="max-height:120px;overflow:auto;">
+              {% for op in hotel.todas_opiniones %}
+              <li class="mb-1"><i class="bi bi-quote"></i> {{ op|e }}</li>
+              {% endfor %}
+            </ul>
+          {% else %}
+            <span class="text-secondary">Sin comentarios disponibles</span>
+          {% endif %}
+          <div class="mt-1 text-muted">{{ hotel.todas_opiniones|length }} comentarios</div>
+        </div>
+        <a href="{{ url_for('hoteles') }}" class="btn btn-outline-primary mt-3"><i class="bi bi-arrow-left"></i> Volver a hoteles</a>
+      </div>
+      <!-- Al final del contenido principal del hotel -->
+      <div class="text-end mt-4">
+        <small class="text-muted" style="font-size:0.92rem; opacity:0.7;">
+          Fuente de datos: {{ hotel.fuente_principal|capitalize }}
+        </small>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const btnFav = document.getElementById('btn-favorito');
+    const msgFav = document.getElementById('favorito-msg');
+    const toastFavorito = new bootstrap.Toast(document.getElementById('toastFavorito'), { delay: 2500 });
+    const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+    if(btnFav) {
+      btnFav.addEventListener('click', function(e) {
+        e.preventDefault();
+        // Cambio visual inmediato (optimista)
+        const icon = btnFav.querySelector('i');
+        const isFav = icon.classList.contains('bi-heart-fill');
+        if(isFav) {
+          icon.classList.remove('bi-heart-fill');
+          icon.classList.add('bi-heart');
+        } else {
+          icon.classList.remove('bi-heart');
+          icon.classList.add('bi-heart-fill');
+        }
+        fetch(window.location.pathname + '/favorito', {
+          method: 'POST',
+          headers: {
+            'X-CSRFToken': csrfToken
+          }
+        })
+          .then(res => res.json())
+          .then(data => {
+            if(data.success) {
+              // Mostrar toast solo si se añadió a favoritos
+              toastFavorito.show();
+            } else {
+              msgFav.style.display = 'none';
+            }
+            setTimeout(() => { msgFav.style.display = 'none'; }, 1800);
+          });
+      });
+    }
+  });
+</script>
+{% endblock %} 

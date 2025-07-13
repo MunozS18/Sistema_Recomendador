@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+{% block title %}Restablecer contraseña | Sistema Recomendador{% endblock %}
+{% block content %}
+<div class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-md-6 col-lg-5">
+      <div class="card shadow p-4">
+        <h2 class="mb-3 text-primary"><i class="bi bi-shield-lock"></i> Restablecer contraseña</h2>
+        <form method="POST" id="reset-form">
+          <div class="mb-3">
+            <label for="password" class="form-label">Nueva contraseña</label>
+            <input type="password" class="form-control" id="password" name="password" required minlength="8" autocomplete="new-password">
+            <div class="form-text" id="passwordHelp">Mínimo 8 caracteres. Usa mayúsculas, minúsculas, números y símbolos para mayor seguridad.</div>
+          </div>
+          <div class="mb-3">
+            <label for="password2" class="form-label">Confirmar contraseña</label>
+            <input type="password" class="form-control" id="password2" name="password2" required minlength="8" autocomplete="new-password">
+          </div>
+          <button type="submit" class="btn btn-primary w-100">Restablecer contraseña</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+  // Validación de coincidencia y fortaleza en tiempo real
+  document.addEventListener('DOMContentLoaded', function() {
+    const pass1 = document.getElementById('password');
+    const pass2 = document.getElementById('password2');
+    const form = document.getElementById('reset-form');
+    form.addEventListener('submit', function(e) {
+      if (pass1.value !== pass2.value) {
+        e.preventDefault();
+        pass2.classList.add('is-invalid');
+        pass2.setCustomValidity('Las contraseñas no coinciden');
+      } else {
+        pass2.classList.remove('is-invalid');
+        pass2.setCustomValidity('');
+      }
+    });
+  });
+</script>
+{% endblock %} 

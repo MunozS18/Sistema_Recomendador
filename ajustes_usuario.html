@@ -1,0 +1,310 @@
+{% extends 'base.html' %}
+<link rel="icon" href="../static/Captura de pantalla 2025-06-25 141949.png">
+<link rel="stylesheet" href="../static/css/styles.css">
+{% block title %}Ajustes de Usuario | Sistema Recomendador 🏨{% endblock %}
+{% block extra_head %}
+<style>
+body.ajustes-bg { background: linear-gradient(135deg, #e0eafc 0%, #cfdef3 100%) !important; }
+.ajustes-sidebar {
+  background: #23272a;
+  color: #fff;
+  min-height: 520px;
+  border-radius: 16px 0 0 16px;
+  padding: 0;
+}
+.ajustes-sidebar .nav-link {
+  color: #b9bbbe;
+  font-size: 1.1rem;
+  padding: 18px 24px;
+  border-radius: 0 24px 24px 0;
+  margin-bottom: 2px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  transition: background 0.2s, color 0.2s;
+}
+.ajustes-sidebar .nav-link.active, .ajustes-sidebar .nav-link:hover {
+  background: #36393f;
+  color: #4da3ff;
+}
+.ajustes-content {
+  background: #fff;
+  border-radius: 0 16px 16px 0;
+  min-height: 520px;
+  padding: 36px 32px 32px 32px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.04);
+}
+@media (max-width: 900px) {
+  .ajustes-sidebar, .ajustes-content { border-radius: 16px !important; }
+}
+.ajustes-content label, .ajustes-content .form-label, .ajustes-content h3, .ajustes-content .fw-bold {
+  color: #222 !important;
+  text-shadow: none !important;
+}
+.amenity-chip {
+    display: inline-block;
+    background: #f8f9fa;
+    color: #222;
+    border-radius: 18px;
+    padding: 6px 16px;
+    margin: 4px 6px 4px 0;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s;
+    user-select: none;
+    border: 1px solid #e0e0e0;
+  }
+  .amenity-chip.selected {
+    background: #4da3ff;
+    color: #fff;
+    font-weight: bold;
+    border: 1px solid #4da3ff;
+  }
+  .ubicacion-chip {
+    display: inline-block;
+    background: #f8f9fa;
+    color: #222;
+    border-radius: 18px;
+    padding: 6px 16px;
+    margin: 4px 6px 4px 0;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s;
+    user-select: none;
+    border: 1px solid #e0e0e0;
+  }
+  .ubicacion-chip.selected {
+    background: #4da3ff;
+    color: #fff;
+    font-weight: bold;
+    border: 1px solid #4da3ff;
+  }
+</style>
+{% endblock %}
+{% block content %}
+<script>document.body.classList.add('ajustes-bg');</script>
+<div class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-lg-9">
+      <div class="d-flex flex-row shadow-lg" style="border-radius:16px; overflow:hidden;">
+        <!-- Sidebar -->
+        <nav class="ajustes-sidebar d-flex flex-column p-0" style="width: 240px;">
+          <a class="nav-link active" href="#" data-section="cuenta"><i class="bi bi-person-circle"></i> Mi cuenta</a>
+          <a class="nav-link" href="#" data-section="preferencias"><i class="bi bi-sliders"></i> Mis preferencias</a>
+          <a class="nav-link" href="#" data-section="privacidad"><i class="bi bi-shield-lock"></i> Privacidad y seguridad</a>
+          <a class="nav-link" href="#" data-section="conexiones"><i class="bi bi-link-45deg"></i> Conexiones</a>
+        </nav>
+        <!-- Contenido dinámico -->
+        <div class="ajustes-content flex-grow-1" id="ajustes-content">
+          <!-- Sección Mi cuenta -->
+          <div class="ajustes-section" id="section-cuenta">
+            <!-- Encabezado de perfil -->
+            <div class="ajustes-profile-header d-flex align-items-center mb-4" style="background: linear-gradient(90deg, #4da3ff 60%, #e0eafc 100%); border-radius: 18px; padding: 38px 40px; min-height: 140px;">
+              <img src="/static/img/user_default.png" alt="Avatar" style="width:82px; height:82px; border-radius:50%; border:3px solid #fff; box-shadow:0 2px 8px rgba(0,0,0,0.08);">
+              <div class="ms-4">
+                <div class="fw-bold" style="font-size:1.55rem; color:#fff;">{{ current_user.email[:current_user.email.find('@')+2] + '***' + current_user.email[-8:] }}</div>
+                <div class="text-light" style="font-size:1.05rem;">ID: {{ current_user.id_usuario }}</div>
+              </div>
+            </div>
+            <!-- Accesos rápidos -->
+            <div class="row mb-3 g-3">
+              <div class="col-6 col-md-4">
+                <a href="/favoritos" class="ajustes-quick-btn d-block text-center py-3 rounded shadow-sm" style="background:#fff; text-decoration:none;">
+                  <i class="bi bi-heart-fill" style="font-size:2.1rem; color:#ff4d6d;"></i>
+                  <div class="fw-bold mt-2" style="color:#222;">Favoritos</div>
+                </a>
+              </div>
+              <div class="col-6 col-md-4">
+                <a href="/historial" class="ajustes-quick-btn d-block text-center py-3 rounded shadow-sm" style="background:#fff; text-decoration:none;">
+                  <i class="bi bi-clock-history" style="font-size:2.1rem; color:#4da3ff;"></i>
+                  <div class="fw-bold mt-2" style="color:#222;">Historial</div>
+                </a>
+              </div>
+            </div>
+            <!-- Galería de historial -->
+            <div class="mb-4">
+              <div class="d-flex align-items-center mb-2" style="gap:8px;">
+                <div class="fw-bold" style="font-size:1.15rem; color:#222;">Historial</div>
+                <a href="/historial" class="ms-auto" style="color:#4da3ff; font-size:1.5rem; text-decoration:none;"><i class="bi bi-chevron-right"></i></a>
+              </div>
+              <div class="d-flex flex-row overflow-auto ajustes-historial-gallery" style="gap:12px;">
+                {% for hotel in historial_hoteles_compactos %}
+                  <div class="ajustes-historial-card text-center" style="min-width:90px;">
+                    <img src="{{ hotel.image or '/static/img/hotel_default.jpg' }}" alt="{{ hotel.name }}" class="rounded mb-1" style="width:70px; height:50px; object-fit:cover;">
+                    <div class="small text-truncate" style="max-width:70px; color:#222;">{{ hotel.name }}</div>
+                  </div>
+                {% else %}
+                  <div class="text-muted">No hay historial reciente.</div>
+                {% endfor %}
+              </div>
+            </div>
+            <!-- Más funciones -->
+            <div class="mb-4">
+              <div class="fw-bold mb-2" style="font-size:1.15rem; color:#222;">Más funciones</div>
+              <ul class="list-group list-group-flush ajustes-func-list">
+                <li class="list-group-item d-flex align-items-center justify-content-between" style="background:transparent;">
+                  <span class="d-flex align-items-center"><i class="bi bi-person-gear me-2" style="color:#4da3ff; font-size:1.3rem;"></i> Gestión</span>
+                  <a href="/gestion_cuenta" class="ms-2" style="color:#4da3ff; font-size:1.3rem;"><i class="bi bi-chevron-right"></i></a>
+                </li>
+                <li class="list-group-item d-flex align-items-center justify-content-between" style="background:transparent;">
+                  <span class="d-flex align-items-center"><i class="bi bi-gear me-2" style="color:#ffb300; font-size:1.3rem;"></i> Configuraciones</span>
+                  <a href="#" class="ms-2" style="color:#ffb300; font-size:1.3rem;"><i class="bi bi-chevron-right"></i></a>
+                </li>
+              </ul>
+            </div>
+            <style>
+            .ajustes-profile-header { box-shadow: 0 2px 12px rgba(0,0,0,0.04); }
+            .ajustes-quick-btn:hover { box-shadow: 0 4px 16px rgba(77,163,255,0.08); transform: translateY(-2px); }
+            .ajustes-historial-gallery::-webkit-scrollbar { height: 8px; }
+            .ajustes-historial-gallery::-webkit-scrollbar-thumb { background: #e0eafc; border-radius: 4px; }
+            .ajustes-historial-card img { border: 2px solid #e0eafc; }
+            .ajustes-func-list .list-group-item { border: none; }
+            </style>
+            <!-- NOTA: favoritos_compactos e historial_hoteles_compactos deben ser pasados desde la vista Flask como listas de dicts con 'name' e 'image' -->
+          </div>
+          <!-- Sección Mis preferencias -->
+          <div class="ajustes-section d-none" id="section-preferencias">
+            <h3 class="mb-3"><i class="bi bi-sliders"></i> Mis preferencias</h3>
+            <!-- Aquí va el formulario de preferencias de viaje -->
+            <form method="POST" novalidate id="preferencias-form">
+              {{ form.hidden_tag() }}
+              <div class="row g-3">
+                <div class="col-md-6">
+                  {{ form.tipo_viaje.label(class="form-label") }}
+                  {{ form.tipo_viaje(class="form-select") }}
+                </div>
+                <div class="col-md-6">
+                  {{ form.presupuesto.label(class="form-label") }}
+                  {{ form.presupuesto(class="form-select") }}
+                </div>
+                <div class="col-12">
+                  <label class="form-label">Ubicación preferida</label>
+                  <div id="ubicaciones-chips" class="mb-2">
+                    {% set ubicaciones_list = [
+                      ('Centro Histórico', '🏛️ Centro Histórico'),
+                      ('Bocagrande', '🏖️ Bocagrande'),
+                      ('Getsemaní', '🎨 Getsemaní'),
+                      ('La Boquilla', '🌊 La Boquilla'),
+                      ('Manga', '🌴 Manga'),
+                      ('Marbella', '🏝️ Marbella'),
+                      ('Castillogrande', '🏰 Castillogrande'),
+                      ('Otro', '📍 Otro')
+                    ] %}
+                    {% set ubic_seleccionadas = (form.ubicacion_preferida.data or '').split(',') %}
+                    {% for value, label in ubicaciones_list %}
+                      <span class="ubicacion-chip{% if value in ubic_seleccionadas %} selected{% endif %}" data-value="{{ value }}">{{ label }}</span>
+                    {% endfor %}
+                  </div>
+                  <input type="hidden" name="ubicacion_preferida" id="ubicacion_preferida_hidden" value="{{ form.ubicacion_preferida.data }}">
+                </div>
+                <div class="col-12">
+                  <label class="form-label">Amenities importantes</label>
+                  <div id="amenities-chips" class="mb-2">
+                    {% set amenities_list = [
+                      'WiFi', 'Piscina', 'Desayuno incluido', 'Spa', 'Restaurante', 'Gimnasio',
+                      'Bar', 'Parqueadero', 'Aire acondicionado', 'Mascotas permitidas',
+                      'Servicio a la habitación', 'Acceso a la playa'
+                    ] %}
+                    {% for amenity in amenities_list %}
+                      <span class="amenity-chip" data-value="{{ amenity }}">{{ amenity }}</span>
+                    {% endfor %}
+                  </div>
+                  <input type="hidden" name="amenities_importantes" id="amenities_importantes_hidden" value="{{ form.amenities_importantes.data }}">
+                </div>
+              </div>
+              <div class="d-grid mt-4">
+                {{ form.submit(class="btn btn-primary btn-lg") }}
+              </div>
+            </form>
+          </div>
+          <!-- Sección Mis favoritos -->
+          <div class="ajustes-section d-none" id="section-favoritos">
+            <h3 class="mb-3"><i class="bi bi-heart-fill"></i> Mis favoritos</h3>
+            <a href="/favoritos" class="btn btn-primary mb-3"><i class="bi bi-heart-fill"></i> Ver galería de favoritos</a>
+            <div class="text-muted">Aquí puedes acceder y gestionar tus hoteles favoritos.</div>
+          </div>
+          <!-- Sección Privacidad y seguridad -->
+          <div class="ajustes-section d-none" id="section-privacidad">
+            <h3 class="mb-3"><i class="bi bi-shield-lock"></i> Privacidad y seguridad</h3>
+            <ul class="list-group mb-3">
+              <li class="list-group-item d-flex align-items-center justify-content-between">
+                Cambiar contraseña
+                <a href="/cambiar_contrasena" class="btn btn-outline-primary btn-sm">Cambiar</a>
+              </li>
+              <li class="list-group-item d-flex align-items-center justify-content-between">
+                Eliminar cuenta
+                <a href="/eliminar_cuenta" class="btn btn-outline-danger btn-sm">Eliminar</a>
+              </li>
+            </ul>
+            <div class="text-muted">Configura la seguridad y privacidad de tu cuenta.</div>
+          </div>
+          <!-- Sección Conexiones -->
+          <div class="ajustes-section d-none" id="section-conexiones">
+            <h3 class="mb-3"><i class="bi bi-link-45deg"></i> Conexiones</h3>
+            <div class="text-muted">Aquí podrás ver y gestionar conexiones externas (próximamente).</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+  // SPA-like navegación de secciones
+  document.addEventListener('DOMContentLoaded', function() {
+    const links = document.querySelectorAll('.ajustes-sidebar .nav-link');
+    const sections = document.querySelectorAll('.ajustes-section');
+    links.forEach(link => {
+      link.addEventListener('click', function(e) {
+        e.preventDefault();
+        links.forEach(l => l.classList.remove('active'));
+        this.classList.add('active');
+        const section = this.getAttribute('data-section');
+        sections.forEach(sec => sec.classList.add('d-none'));
+        document.getElementById('section-' + section).classList.remove('d-none');
+      });
+    });
+  });
+  // Chips de amenities
+  const chips = document.querySelectorAll('.amenity-chip');
+  const amenitiesInput = document.getElementById('amenities_importantes_hidden');
+  chips.forEach(chip => {
+    chip.addEventListener('click', function() {
+      chip.classList.toggle('selected');
+      const selected = Array.from(document.querySelectorAll('.amenity-chip.selected')).map(c => c.dataset.value);
+      amenitiesInput.value = selected.join(', ');
+    });
+  });
+  // Al cargar, si hay amenities ya seleccionados, márcalos
+  document.addEventListener('DOMContentLoaded', function() {
+    if (amenitiesInput && amenitiesInput.value) {
+      const selected = amenitiesInput.value.split(',').map(s => s.trim());
+      chips.forEach(chip => {
+        if (selected.includes(chip.dataset.value)) {
+          chip.classList.add('selected');
+        }
+      });
+    }
+  });
+  // Chips de ubicaciones (selección múltiple)
+  const ubicChips = document.querySelectorAll('.ubicacion-chip');
+  const ubicInput = document.getElementById('ubicacion_preferida_hidden');
+  ubicChips.forEach(chip => {
+    chip.addEventListener('click', function() {
+      chip.classList.toggle('selected');
+      const selected = Array.from(document.querySelectorAll('.ubicacion-chip.selected')).map(c => c.dataset.value);
+      ubicInput.value = selected.join(', ');
+    });
+  });
+  // Al cargar, si hay ubicaciones ya seleccionadas, márcalas
+  document.addEventListener('DOMContentLoaded', function() {
+    if (ubicInput && ubicInput.value) {
+      const selected = ubicInput.value.split(',').map(s => s.trim());
+      ubicChips.forEach(chip => {
+        if (selected.includes(chip.dataset.value)) {
+          chip.classList.add('selected');
+        }
+      });
+    }
+  });
+</script>
+{% endblock %} 

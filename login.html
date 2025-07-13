@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+<link rel="icon" href="../static/Captura de pantalla 2025-06-25 141949.png">
+{% block title %}Iniciar sesión | Sistema Recomendador 🏨{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-md-6">
+    <div class="card shadow-lg p-4" data-aos="zoom-in">
+      <h2 class="mb-4 text-center" style="font-family: 'Times New Roman', Times, serif;">Inicia sesión</h2>
+      <form method="POST" novalidate>
+        {{ form.hidden_tag() }}
+        <div class="mb-3">
+          {{ form.email.label(class="form-label") }}
+          {{ form.email(class="form-control", placeholder="ejemplo@email.com") }}
+          {% for error in form.email.errors %}
+            <div class="text-danger small">{{ error }}</div>
+          {% endfor %}
+        </div>
+        <div class="mb-3">
+          {{ form.contrasena.label(class="form-label") }}
+          {{ form.contrasena(class="form-control", placeholder="Contraseña") }}
+          {% for error in form.contrasena.errors %}
+            <div class="text-danger small">{{ error }}</div>
+          {% endfor %}
+        </div>
+        <div class="d-grid">
+          {{ form.submit(class="btn btn-primary btn-lg") }}
+        </div>
+      </form>
+      <div class="mt-3 text-center">
+        ¿No tienes cuenta? <a href="/register">Regístrate</a>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %} 

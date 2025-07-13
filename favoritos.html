@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+{% block title %}Mis Favoritos | Sistema Recomendador{% endblock %}
+{% block content %}
+<div class="container py-4">
+  <h2 class="mb-4 text-primary"><i class="bi bi-heart-fill"></i> Mis Hoteles Favoritos</h2>
+  {% if fav_hoteles and fav_hoteles|length > 0 %}
+    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+      {% for hotel in fav_hoteles %}
+        <div class="col">
+          <div class="card h-100 shadow-sm position-relative">
+            <a href="/hotel/{{ hotel.slug }}">
+              <img src="{{ hotel.image }}" class="card-img-top" alt="Imagen de {{ hotel.name }}" style="height:180px; object-fit:cover;">
+            </a>
+            <div class="card-body">
+              <h5 class="card-title mb-1">
+                <a href="/hotel/{{ hotel.slug }}" class="text-dark fw-bold" style="text-decoration:none;">{{ hotel.name }}</a>
+              </h5>
+            </div>
+            <button class="btn btn-link position-absolute top-0 end-0 m-2 btn-eliminar-fav" data-hotel-slug="{{ hotel.slug }}" title="Eliminar de favoritos" style="font-size:1.7rem; color:#0d6efd;">
+              <i class="bi bi-heart-fill"></i>
+            </button>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <div class="text-muted text-center">Aún no tienes hoteles favoritos. ¡Marca hoteles con el corazón para agregarlos aquí!</div>
+  {% endif %}
+  <a href="/ajustes" class="btn btn-outline-primary mt-4"><i class="bi bi-arrow-left"></i> Volver a mi cuenta</a>
+</div>
+{% block extra_js %}
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('.btn-eliminar-fav').forEach(function(btn) {
+      btn.addEventListener('click', function(e) {
+        e.preventDefault();
+        const slug = this.getAttribute('data-hotel-slug');
+        fetch(`/hotel/${slug}/favorito`, {method: 'POST'})
+          .then(res => res.json())
+          .then(data => {
+            if(data.success === false) {
+              this.closest('.col').remove();
+            }
+          });
+      });
+    });
+  });
+</script>
+{% endblock %}
+{% endblock %} 

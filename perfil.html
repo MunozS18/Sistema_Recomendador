@@ -1,0 +1,67 @@
+{% extends 'base.html' %}
+<link rel="icon" href="../static/Captura de pantalla 2025-06-25 141949.png">
+{% block title %}Perfil | Sistema Recomendador 🏨{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-md-8">
+    <div class="card shadow-lg p-4" data-aos="fade-up">
+      <h2 class="mb-4 text-center" style="font-family: 'Times New Roman', Times, serif;">Mi Perfil</h2>
+      <ul class="list-group list-group-flush mb-3">
+        <li class="list-group-item"><strong>Usuario:</strong> {{ user.nombre_usuario|e }}</li>
+        <li class="list-group-item"><strong>Email:</strong> {{ user.email|e }}</li>
+        <li class="list-group-item"><strong>Fecha de registro:</strong> {{ user.fecha_registro.strftime('%d/%m/%Y') }}</li>
+        <li class="list-group-item"><strong>Último login:</strong> {{ user.ultimo_login.strftime('%d/%m/%Y %H:%M') if user.ultimo_login else 'N/D' }}</li>
+      </ul>
+      <a href="/ajustes" class="btn btn-primary mb-3">Editar preferencias</a>
+      <a href="/favoritos" class="btn btn-outline-danger mb-3 ms-2"><i class="bi bi-heart-fill"></i> Ver mis favoritos</a>
+      <form method="POST" action="/perfil/borrar_historial" onsubmit="return confirm('¿Estás seguro de borrar todo tu historial? Esta acción no se puede deshacer.');">
+        <button type="submit" class="btn btn-danger mb-3">Borrar todo mi historial</button>
+      </form>
+      <hr>
+      <h4 class="mb-3">Historial de Actividad</h4>
+      <div class="mb-3">
+        <h5>Valoraciones</h5>
+        {% if valoraciones and valoraciones|length > 0 %}
+          <ul class="list-group mb-2">
+            {% for v in valoraciones %}
+              <li class="list-group-item">
+                <strong>{{ v.id_hotel|e }}</strong>: {{ v.puntuacion }} ⭐ - {{ v.comentario|e or '' }}
+              </li>
+            {% endfor %}
+          </ul>
+        {% else %}
+          <div class="text-muted">Sin valoraciones.</div>
+        {% endif %}
+      </div>
+      <div class="mb-3">
+        <h5>Interacciones</h5>
+        {% if interacciones and interacciones|length > 0 %}
+          <ul class="list-group mb-2">
+            {% for i in interacciones %}
+              <li class="list-group-item">
+                <strong>{{ hoteles_dict[i.id_hotel]|e if i.id_hotel in hoteles_dict else i.id_hotel|e }}</strong>: {{ i.tipo_interaccion|e }} ({{ i.valor }})
+              </li>
+            {% endfor %}
+          </ul>
+        {% else %}
+          <div class="text-muted">Sin interacciones.</div>
+        {% endif %}
+      </div>
+      <div class="mb-3">
+        <h5>Preferencias</h5>
+        {% if preferencias %}
+          <ul class="list-group mb-2">
+            <li class="list-group-item"><strong>Tipo de viaje:</strong> {{ preferencias.tipo_viaje|e }}</li>
+            <li class="list-group-item"><strong>Presupuesto:</strong> {{ preferencias.presupuesto|e }}</li>
+            <li class="list-group-item"><strong>Ubicación preferida:</strong> {{ preferencias.ubicacion_preferida|e }}</li>
+            <li class="list-group-item"><strong>Amenities importantes:</strong> {{ preferencias.amenities_importantes|e }}</li>
+            <li class="list-group-item"><strong>Rating mínimo:</strong> {{ preferencias.rating_minimo }}</li>
+          </ul>
+        {% else %}
+          <div class="text-muted">Sin preferencias guardadas.</div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %} 

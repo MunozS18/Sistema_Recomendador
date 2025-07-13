@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+<link rel="icon" href="../static/Captura de pantalla 2025-06-25 141949.png">
+{% block title %}Registro | Sistema Recomendador 🏨{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-md-6">
+    <div class="card shadow-lg p-4" data-aos="zoom-in">
+      <h2 class="mb-4 text-center" style="font-family: 'Times New Roman', Times, serif;">Crea tu cuenta</h2>
+      <form method="POST" novalidate>
+        {{ form.hidden_tag() }}
+        <div class="mb-3">
+          {{ form.nombre_usuario.label(class="form-label") }}
+          {{ form.nombre_usuario(class="form-control", placeholder="Tu nombre de usuario") }}
+          {% for error in form.nombre_usuario.errors %}
+            <div class="text-danger small">{{ error }}</div>
+          {% endfor %}
+        </div>
+        <div class="mb-3">
+          {{ form.email.label(class="form-label") }}
+          {{ form.email(class="form-control", placeholder="ejemplo@email.com") }}
+          {% for error in form.email.errors %}
+            <div class="text-danger small">{{ error }}</div>
+          {% endfor %}
+        </div>
+        <div class="mb-3">
+          {{ form.contrasena.label(class="form-label") }}
+          {{ form.contrasena(class="form-control", placeholder="Contraseña segura") }}
+          {% for error in form.contrasena.errors %}
+            <div class="text-danger small">{{ error }}</div>
+          {% endfor %}
+        </div>
+        <div class="mb-3">
+          {{ form.confirmar_contrasena.label(class="form-label") }}
+          {{ form.confirmar_contrasena(class="form-control", placeholder="Repite tu contraseña") }}
+          {% for error in form.confirmar_contrasena.errors %}
+            <div class="text-danger small">{{ error }}</div>
+          {% endfor %}
+        </div>
+        <div class="d-grid">
+          {{ form.submit(class="btn btn-primary btn-lg") }}
+        </div>
+      </form>
+      <div class="mt-3 text-center">
+        ¿Ya tienes cuenta? <a href="/login">Inicia sesión</a>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %} 
